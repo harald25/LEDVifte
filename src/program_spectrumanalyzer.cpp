@@ -1,5 +1,54 @@
 #include "program_spectrumanalyzer.h"
 
+DEFINE_GRADIENT_PALETTE( spectrum_gradient1_gp ) {
+  0,   0,  255,  0,     //Green
+110,   0,  255,  0,     //Green
+126,   255,200,  0,   //bright yellow
+190,   255,200,  0,   //bright yellow
+215,   255,  0,  0,    //Red
+255,   255,  0,  0};    //Red
+
+DEFINE_GRADIENT_PALETTE( spectrum_gradient2_gp ) {
+0,      0,  0,  244,    //Blue
+109,    0,  0,  244,    //Blue
+110,   255,    0,  175,   //Lilla
+190,   255,    0,  175,   //Lilla
+191,   255,    0,  0,    //Red
+255,   255,    0,  0};    //Red
+
+DEFINE_GRADIENT_PALETTE( spectrum_gradient3_gp ) {
+0,      0,  200,  245,    //Bright blue
+//25,      0,  200,  245,    //Bright blue
+25,    0,  255,  0,    //Pastel green
+150,    0,  255,  0,    //Pastel green
+200,   239, 255,  10,   //Yellow
+255,   255,   0,  0};    //Red
+
+DEFINE_GRADIENT_PALETTE( spectrum_gradient4_gp ) {
+0,   255,    0,  0,    //Red
+109,   255,    0,  0,    //Red
+110,   255,    0,  175,   //Lilla
+190,   255,    0,  175,   //Lilla
+191,      0,  0,  244,    //Blue
+255,    0,  0,  244};    //Blue
+
+DEFINE_GRADIENT_PALETTE( spectrum_gradient5_gp ) {
+0,   245,    50,  207,    //Pastel pink
+100,   245,    50,  207,    //Pastel pink
+125,   32,    255,  125,    //Pastel green
+175,   32,    255,  125,    //Pastel green
+200,   0,    162,  255,    //Pastel Blue
+255,   0,    162,  255};    //Pastel Blue
+
+CRGBPalette16 spectrumGradient5 = spectrum_gradient5_gp;
+CRGBPalette16 spectrumGradient4 = spectrum_gradient4_gp;
+CRGBPalette16 spectrumGradient3 = spectrum_gradient3_gp;
+CRGBPalette16 spectrumGradient2 = spectrum_gradient2_gp;
+CRGBPalette16 spectrumGradient1 = spectrum_gradient1_gp;
+CRGBPalette16 * active_palette;
+
+spectrum_mode spec_mode;
+
 // The display size and color to use
 const unsigned int matrix_width = 11;
 const unsigned int matrix_height = 32;
@@ -88,6 +137,8 @@ void spectrumAnalyzer()
   update = true;
   saturation1 = 255;
   value1 = 175;
+  active_palette = &spectrumGradient1;
+  spec_mode = GRADIENT;
 }
 
 void spectrumAnalyzerUpdate()
@@ -122,19 +173,30 @@ void spectrumAnalyzerUpdate()
       // Serial.print(level);
       // Serial.print("  ");
 
-      for (y=0; y < matrix_height; y++) {
+      for (y=0; y < matrix_height; y++)
+      {
         // for each vertical pixel, check if above the threshold
         // and turn the LED on or off
         gradientIndex = (matrix_height-y-2)*7.9;
         if (((matrix_height-y-2)*7.9) > 254) {
           gradientIndex = 254;
         }
-        if (level >= thresholdVertical[y]) {
-          leds[xy(x,y)] = CHSV(gradientIndex,saturation1,value1);
-          leds[xy(x,y)+352] = CHSV(gradientIndex,saturation1,value1);
-          //leds[xy(x,y)] = ColorFromPalette(spectrumGradient2,gradientIndex);
-          //leds[xy(x,y)+352] = ColorFromPalette(spectrumGradient2,gradientIndex);
-        } else {
+        if (level >= thresholdVertical[y])
+        {
+          if (spec_mode == RAINBOW)
+          {
+            leds[xy(x,y)] = CHSV(gradientIndex,saturation1,value1);
+            leds[xy(x,y)+352] = CHSV(gradientIndex,saturation1,value1);
+          }
+          if(spec_mode == GRADIENT)
+          {
+            leds[xy(x,y)] = ColorFromPalette(*active_palette,gradientIndex);
+            leds[xy(x,y)+352] = ColorFromPalette(*active_palette,gradientIndex);
+          }
+
+        }
+        else
+        {
           leds[xy(x,y)] = CRGB::Black;
           leds[xy(x,y)+352] = CRGB::Black;
         }
@@ -151,7 +213,8 @@ void spectrumAnalyzerUpdate()
 }
 
 // Run once from setup, the compute the vertical levels
-void computeVerticalLevels() {
+void computeVerticalLevels()
+{
   unsigned int y;
   float n, logLevel, linearLevel;
 
@@ -162,5 +225,39 @@ void computeVerticalLevels() {
     linearLevel = linearLevel * linearBlend;
     logLevel = logLevel * (1.0 - linearBlend);
     thresholdVertical[y] = (logLevel + linearLevel) * maxLevel;
+  }
+}
+
+void changePalette(uint8_t palette_number)
+{
+  if (palette_number == 1)
+  {
+    spec_mode = GRADIENT;
+    active_palette = &spectrumGradient1;
+
+  }
+  if (palette_number == 2)
+  {
+    spec_mode = GRADIENT;
+    active_palette = &spectrumGradient2;
+  }
+  if (palette_number == 3)
+  {
+    spec_mode = GRADIENT;
+    active_palette = &spectrumGradient3;
+  }
+  if (palette_number == 4)
+  {
+    spec_mode = GRADIENT;
+    active_palette = &spectrumGradient4;
+  }
+  if (palette_number == 5)
+  {
+    spec_mode = GRADIENT;
+    active_palette = &spectrumGradient5;
+  }
+  if (palette_number == 6)
+  {
+    spec_mode = RAINBOW;
   }
 }

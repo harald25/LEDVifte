@@ -21,5 +21,6 @@ void setColorPreset(uint8_t color_preset);
 void setColor1(uint8_t x, uint8_t y);
 void allLedsOff();
 void allLedsOn();
+void setGlobalBrightness(uint8_t brightness);
 
 #endif

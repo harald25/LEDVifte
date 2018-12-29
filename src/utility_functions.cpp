@@ -42,6 +42,10 @@ void incrementIndex(int *program_index, uint16_t *total_steps, int *increment_by
   }
 }
 
+void setGlobalBrightness(uint8_t brightness) {
+  FastLED.setBrightness(brightness);
+}
+
 void setHue1(uint8_t hue) {
   hue1 = hue;
 }
@@ -89,6 +93,11 @@ void changeLEDProgram(OSCMessage &msg, int addrOffset )
 
 void changeValue(OSCMessage &msg, int addrOffset )
 {
+  if (msg.fullMatch("/Variable/palette"))
+  {
+    changePalette((uint8_t)msg.getFloat(0));
+    update = true;
+  }
 
   if (msg.fullMatch("/Variable/interval"))
   {
@@ -176,6 +185,11 @@ void changeValue(OSCMessage &msg, int addrOffset )
     FastLED.delay(10);
     Serial.print("Update: ");
     Serial.println(update);
+  }
+
+  if(msg.fullMatch("/Variable/globalbrightness"))
+  {
+    setGlobalBrightness((uint8_t)msg.getFloat(0));
   }
 }
 
