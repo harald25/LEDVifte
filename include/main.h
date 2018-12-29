@@ -6,20 +6,21 @@
 #include<FastLED.h>
 #include "utility_functions.h"
 #include "osc.h"
+#include "program_spectrumanalyzer.h"
+#include <Audio.h>
+#include <Wire.h>
+#include <SPI.h>
 
 extern CRGBPalette16 blink_palette_purple;
 extern CRGBPalette16 blink_palette_orange;
 extern CRGBPalette16 blink_palette_bluetones;
 extern CRGBPalette16 heatcolorPalette;
 
-#define NUM_LEDS_PER_STRIP 150
+#define NUM_LEDS_PER_STRIP 352
 #define NUM_STRIPS 8
 #define COLOR_CORRECTION TypicalSMD5050
 #define GLOBAL_BRIGHTNESS 255
 extern CRGB leds [NUM_LEDS_PER_STRIP*NUM_STRIPS];
-
-// ----- Array to hold x and y coordinates for all the LEDs
-extern int led_coordinates [NUM_LEDS_PER_STRIP*NUM_STRIPS][2];
 
 // ----- An array that holds the correct order of the LEDs ----- //
 // ----- Because I put each individual LED strip in reverse in my roof T_T ----- //
@@ -27,7 +28,7 @@ extern int led_array [NUM_LEDS_PER_STRIP*NUM_STRIPS];
 
 
 // ----- DECLEARING VARIABLES ----- //
-enum program { NONE };
+enum program { NONE, SPECTRUM_ANALYZER };
 enum direction { FORWARD, REVERSE};
 enum display_mode { CONTINOUS_STRIP, SAME_ON_ALL_STRIPS };
 extern bool debug;
@@ -51,6 +52,5 @@ extern uint8_t hue2;
 extern bool update;
 extern char osc_message_address[18];
 extern float delta;
-extern float slope;
 
 #endif

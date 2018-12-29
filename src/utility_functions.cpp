@@ -11,6 +11,9 @@ void updateLEDs()
       {
         case NONE:
           break;
+        case SPECTRUM_ANALYZER:
+          spectrumAnalyzerUpdate();
+          break;
         default:
           break;
       }
@@ -48,14 +51,9 @@ void setValue1(uint8_t value) {
 void setSaturation1(uint8_t saturation) {
   saturation1 = saturation;
 }
-void setSlope(float s) {
-  slope = s;
-}
-
 void setInterval(uint8_t i) {
   interval = i;
 }
-
 void changePreset(OSCMessage &msg, int addrOffset )
 {
   if (debug) {
